@@ -76,8 +76,6 @@ FMOD_RESULT UOdinFmodAdapter::pcmreadcallback(FMOD_SOUND* inSound, void* data, u
 		BufferSize = requestedDataArrayLength;
 	}
 
-	float* fltData = reinterpret_cast<float*>(data);
-
 	const uint32 Result = SoundGenerator->OnGenerateAudio(Buffer, (int32)requestedDataArrayLength);
 
 	if (odin_is_error(Result))
