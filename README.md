@@ -6,8 +6,8 @@ This Unreal Engine sample project shows how to implement and use a class that pa
 
 ## Pre-requisities
 
-To be able to use the project you will need to have access to FMOD Studio and their Unreal Plugin. You can get them [here](https://www.fmod.com/download#fmodforunreal).
-Also you will need to install the Odin Voice Chat Plugin for Unreal, available [here](https://github.com/4Players/odin-sdk-unreal/releases) or in the [Unreal Marketplace](https://www.unrealengine.com/marketplace/en-US/product/4players-odin-sdk).
+To be able to use the project you will need to have access to FMOD Studio and their Unreal Plugin. You can get them [here](https://www.fmod.com/download#fmodforunreal). Copy the content of the downloaded zip file into the Plugins folder of the project.
+Also you will need to install the Odin Voice Chat Plugin for Unreal, available [here](https://github.com/4Players/odin-sdk-unreal/releases) or in the [Unreal Marketplace](https://www.unrealengine.com/marketplace/en-US/product/4players-odin-sdk). This also needs to be copied to the Plugins folder.
 
 In order to fully understand the sample and the code feel free to visit our [detailed integration guide](https://www.4players.io/odin/guides/unreal/odin-fmod-unreal/).
 
