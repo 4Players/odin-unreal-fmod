@@ -32,8 +32,8 @@
 
 ## Ignore any plugin binaries or intermediates
 
-/Plugins/**/Binaries
-/Plugins/**/Intermediate
+# /Plugins/**/Binaries
+# /Plugins/**/Intermediate
 /Plugins/**/ASCCache
 
 # Git merge conflict files
@@ -146,7 +146,7 @@ SourceArt/**/*.tga
 
 # Binary Files
 Binaries/*
-Plugins/*/Binaries/*
+# Plugins/*/Binaries/*
 
 # Builds
 Build/*
@@ -174,3 +174,9 @@ DerivedDataCache/*
 
 !Plugins/Odin/ThirdParty/OdinLibrary/x64/Win/odin.dll
 !Plugins/Odin/ThirdParty/OdinLibrary/x64/Win/odin.lib
+
+!Plugins/**/*.dll
+!Plugins/**/*.lib
+!Plugins/**/*.so
+
+#**Binaries/**/UnrealEditor*.dll
