@@ -36,6 +36,8 @@ public:
 	// Sets default values for this component's properties
 	void BeginPlay() override;
 
+	void DestroyComponent(bool bPromoteChildren) override;
+
 	UOdinFmodAdapter();
 
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
@@ -51,10 +53,10 @@ public:
 	EFmodDspPan3dRolloffType RolloffType = EFmodDspPan3dRolloffType::FMOD_DSP_PAN_3D_ROLLOFF_LINEARSQUARED;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (ClampMin = "0.0", UIMin = "0.0"))
-	float MinimumDistance = 100.0f;
+	float MinimumDistance = 1.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (ClampMin = "0.0", UIMin = "0.0"))
-	float MaximumDistance = 2000.0f;
+	float MaximumDistance = 20.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	EFmodDspPan3dExtentMode ExtentMode = EFmodDspPan3dExtentMode::FMOD_DSP_PAN_3D_EXTENT_MODE_AUTO;
@@ -74,6 +76,7 @@ public:
 	static FMOD_RESULT OdinDSPReadCallback(FMOD_DSP_STATE* dsp_state, float* inbuffer, float* outbuffer, unsigned int length, int inchannels, int* outchannels);
 
 	FMOD::DSP* dsp_objectpan;
+	FMOD::DSP* mOdinDSP = nullptr;
 
 protected:
 
@@ -81,9 +84,11 @@ protected:
 	UOdinPlaybackMedia* PlaybackMedia = nullptr;
 	TSharedPtr<OdinMediaSoundGenerator, ESPMode::ThreadSafe> SoundGenerator;
 
+	FMOD::ChannelGroup* group;
+
 	void Update3DPosition();
 
 	void UpdateAttenSettings();
 
-	FMOD_VECTOR ConvertUnrealToFmodVector(FVector in);
+	FMOD_VECTOR ConvertUnrealToFmodVector(FVector in, float scale = 1.0f);
 };
