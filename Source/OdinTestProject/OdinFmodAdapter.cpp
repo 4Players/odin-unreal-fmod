@@ -84,7 +84,7 @@ void UOdinFmodAdapter::Update3DPosition()
 	attrs.numlisteners = 1;
 	attrs.absolute = absattr;
 
-	dsp_objectpan->setParameterData(FMOD_DSP_PAN_3D_POSITION, &attrs, sizeof(FMOD_DSP_PARAMETER_3DATTRIBUTES_MULTI));
+	dsp_pan->setParameterData(FMOD_DSP_PAN_3D_POSITION, &attrs, sizeof(FMOD_DSP_PARAMETER_3DATTRIBUTES_MULTI));
 
 	group->set3DAttributes(&absattr.position, &absattr.velocity);
 
@@ -103,12 +103,12 @@ void UOdinFmodAdapter::Update3DPosition()
 
 void UOdinFmodAdapter::UpdateAttenSettings()
 {
-	dsp_objectpan->setParameterInt(FMOD_DSP_PAN_3D_ROLLOFF, (int)RolloffType);
-	dsp_objectpan->setParameterFloat(FMOD_DSP_PAN_3D_MIN_DISTANCE, MinimumDistance);
-	dsp_objectpan->setParameterFloat(FMOD_DSP_PAN_3D_MAX_DISTANCE, MaximumDistance);
-	dsp_objectpan->setParameterInt(FMOD_DSP_PAN_3D_EXTENT_MODE, (int)ExtentMode);
-	dsp_objectpan->setParameterFloat(FMOD_DSP_PAN_3D_SOUND_SIZE, SoundSize);
-	dsp_objectpan->setParameterFloat(FMOD_DSP_PAN_3D_MIN_EXTENT, MinimumExtent);
+	dsp_pan->setParameterInt(FMOD_DSP_PAN_3D_ROLLOFF, (int)RolloffType);
+	dsp_pan->setParameterFloat(FMOD_DSP_PAN_3D_MIN_DISTANCE, MinimumDistance);
+	dsp_pan->setParameterFloat(FMOD_DSP_PAN_3D_MAX_DISTANCE, MaximumDistance);
+	dsp_pan->setParameterInt(FMOD_DSP_PAN_3D_EXTENT_MODE, (int)ExtentMode);
+	dsp_pan->setParameterFloat(FMOD_DSP_PAN_3D_SOUND_SIZE, SoundSize);
+	dsp_pan->setParameterFloat(FMOD_DSP_PAN_3D_MIN_EXTENT, MinimumExtent);
 }
 
 FMOD_VECTOR UOdinFmodAdapter::ConvertUnrealToFmodVector(FVector in, float scale)
@@ -146,7 +146,7 @@ void UOdinFmodAdapter::BeginPlay()
 		}
 	}
 
-	FMOD_RESULT result = CoreSystem->createDSPByType(FMOD_DSP_TYPE_PAN, &dsp_objectpan);
+	FMOD_RESULT result = CoreSystem->createDSPByType(FMOD_DSP_TYPE_PAN, &dsp_pan);
 
 	
 
@@ -154,7 +154,7 @@ void UOdinFmodAdapter::BeginPlay()
 	{
 		CoreSystem->getMasterChannelGroup(&group);
 
-		if (group->addDSP(FMOD_CHANNELCONTROL_DSP_HEAD, dsp_objectpan) == FMOD_RESULT::FMOD_OK)
+		if (group->addDSP(FMOD_CHANNELCONTROL_DSP_HEAD, dsp_pan) == FMOD_RESULT::FMOD_OK)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Added Object Spatializer DSP to channel group"));
 
@@ -163,10 +163,10 @@ void UOdinFmodAdapter::BeginPlay()
 	}
 
 	// Set Pan Output to Stereo
-	dsp_objectpan->setParameterInt(FMOD_DSP_PAN_MODE, (int)FMOD_DSP_PAN_MODE_SURROUND);
+	dsp_pan->setParameterInt(FMOD_DSP_PAN_MODE, (int)FMOD_DSP_PAN_MODE_SURROUND);
 
 	// Set Pan Mode to full 3D Positional
-	dsp_objectpan->setParameterFloat(FMOD_DSP_PAN_3D_PAN_BLEND, 1.0f);
+	dsp_pan->setParameterFloat(FMOD_DSP_PAN_3D_PAN_BLEND, 1.0f);
 
 	UpdateAttenSettings();
 	Update3DPosition();
@@ -174,16 +174,10 @@ void UOdinFmodAdapter::BeginPlay()
 
 void UOdinFmodAdapter::DestroyComponent(bool bPromoteChildren)
 {
-	FMOD::Studio::System* System = IFMODStudioModule::Get().GetStudioSystem(EFMODSystemContext::Runtime);
-	FMOD::System* CoreSystem = nullptr;
-	System->getCoreSystem(&CoreSystem);
-
-	CoreSystem->getMasterChannelGroup(&group);
-
-	auto result2 = group->removeDSP(dsp_objectpan);
+	auto result2 = group->removeDSP(dsp_pan);
 	auto result4 = group->removeDSP(mOdinDSP);
 
-	dsp_objectpan->release();
+	dsp_pan->release();
 	mOdinDSP->release();
 
 	Super::DestroyComponent(bPromoteChildren);

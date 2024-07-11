@@ -75,7 +75,7 @@ public:
 
 	static FMOD_RESULT OdinDSPReadCallback(FMOD_DSP_STATE* dsp_state, float* inbuffer, float* outbuffer, unsigned int length, int inchannels, int* outchannels);
 
-	FMOD::DSP* dsp_objectpan;
+	FMOD::DSP* dsp_pan;
 	FMOD::DSP* mOdinDSP = nullptr;
 
 protected:
