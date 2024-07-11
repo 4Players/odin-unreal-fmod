@@ -180,3 +180,19 @@ DerivedDataCache/*
 !Plugins/**/*.so
 
 #**Binaries/**/UnrealEditor*.dll
+Plugins/FMODStudio/Binaries/Win64/UnrealEditor-FMODStudio-Win64-DebugGame.dll
+Plugins/FMODStudio/Binaries/Win64/UnrealEditor-FMODStudio.dll
+Plugins/FMODStudio/Binaries/Win64/UnrealEditor-FMODStudioEditor-Win64-DebugGame.dll
+Plugins/FMODStudio/Binaries/Win64/UnrealEditor-FMODStudioEditor.dll
+Plugins/FMODStudio/Binaries/Win64/UnrealEditor-Win64-DebugGame.modules
+Plugins/FMODStudio/Binaries/Win64/UnrealEditor.modules
+Plugins/FMODStudioNiagara/Binaries/Win64/UnrealEditor-FMODStudioNiagara-Win64-DebugGame.dll
+Plugins/FMODStudioNiagara/Binaries/Win64/UnrealEditor-FMODStudioNiagara.dll
+Plugins/FMODStudioNiagara/Binaries/Win64/UnrealEditor-Win64-DebugGame.modules
+Plugins/FMODStudioNiagara/Binaries/Win64/UnrealEditor.modules
+Plugins/Odin/Binaries/Win64/UnrealEditor-Odin-Win64-DebugGame.dll
+Plugins/Odin/Binaries/Win64/UnrealEditor-Odin.dll
+Plugins/Odin/Binaries/Win64/UnrealEditor-Win64-DebugGame.modules
+Plugins/Odin/Binaries/Win64/UnrealEditor.modules
+README.html
+README.pdf
