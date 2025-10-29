@@ -1,6 +1,6 @@
 # Odin to Fmod Adapter for Unreal Engine
 
-This Unreal Engine sample project shows how to implement and use a class that passes the [Odin Voice Chat](https://www.4players.io/odin/)'s data to the [FMOD Audio Engine](https://www.fmod.com/docs/2.03/unreal/welcome.html).
+This Unreal Engine sample project shows how to implement and use a class that passes the [Odin Voice Chat](https://docs.4players.io/voice/unreal/)'s data to the [FMOD Audio Engine](https://www.fmod.com/docs/2.03/unreal/welcome.html).
 
 ![FMOD and Odin](/Documentation/fmod_with_odin_header.jpg)
 
@@ -9,7 +9,7 @@ This Unreal Engine sample project shows how to implement and use a class that pa
 To be able to use the project you will need to have access to FMOD Studio and their Unreal Plugin. You can get them [here](https://www.fmod.com/download#fmodforunreal). Copy the content of the downloaded zip file into the Plugins folder of the project.
 Also you will need to install the Odin Voice Chat Plugin for Unreal, available [here](https://github.com/4Players/odin-sdk-unreal/releases) or in the [Unreal Marketplace](https://www.unrealengine.com/marketplace/en-US/product/4players-odin-sdk). This also needs to be copied to the Plugins folder.
 
-In order to fully understand the sample and the code feel free to visit our [detailed integration guide](https://www.4players.io/odin/guides/unreal/odin-fmod-unreal/).
+In order to fully understand the sample and the code feel free to visit our [detailed integration guide](https://docs.4players.io/voice/unreal/guides/odin-fmod-unreal/).
 
 ## Quick Start
 
