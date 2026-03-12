@@ -9,6 +9,7 @@ public class OdinTestProjectTarget : TargetRules
 	{
 		Type = TargetType.Game;
 		DefaultBuildSettings = BuildSettingsVersion.V2;
-		ExtraModuleNames.Add("OdinTestProject");
+        CppStandard = CppStandardVersion.Cpp20;
+        ExtraModuleNames.Add("OdinTestProject");
 	}
 }

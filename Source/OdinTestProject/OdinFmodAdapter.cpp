@@ -5,19 +5,19 @@
 #include "FMODStudioModule.h"
 #include "odin.h"
 #include "OdinFunctionLibrary.h"
-#include "OdinMediaSoundGenerator.h"
-#include "OdinPlaybackMedia.h"
+#include "OdinAudio/OdinSoundGenerator.h"
+#include "OdinAudio/OdinSynthComponent.h"
 #include <Kismet/KismetMathLibrary.h>
 
-void UOdinFmodAdapter::AssignOdinMedia(UOdinPlaybackMedia*& Media)
+void UOdinFmodAdapter::AssignOdinMedia(UPARAM(ref) UOdinSynthComponent*& Media)
 {
 	if (nullptr == Media)
 		return;
 
-	this->SoundGenerator = MakeShared<OdinMediaSoundGenerator, ESPMode::ThreadSafe>();
+	this->SoundGenerator = MakeShared<FOdinSoundGenerator, ESPMode::ThreadSafe>();
 	this->PlaybackMedia = Media;
 
-	SoundGenerator->SetOdinStream(Media->GetMediaHandle());
+	SoundGenerator->SetOdinDecoder(Media->GetDecoder());
 }
 
 void UOdinFmodAdapter::SetAttenuation(EFmodDspPan3dRolloffType InRolloffType, float InMinimumDistance, float InMaximumDistance, EFmodDspPan3dExtentMode InExtentMode, float InSoundSize, float InMinimumExtent, float InOutputGain)
@@ -207,10 +207,9 @@ FMOD_RESULT UOdinFmodAdapter::dspreadcallback(FMOD_DSP_STATE* dsp_state, float* 
 
 	const uint32 Result = SoundGenerator->OnGenerateAudio(data, (int32)requestedDataArrayLength);
 
-	if (odin_is_error(Result))
+	if (Result != requestedDataArrayLength)
 	{
-		FString ErrorString = UOdinFunctionLibrary::FormatError(Result, true);
-		UE_LOG(LogTemp, Error, TEXT("UOdinFmodAdapter: Error during FillSamplesBuffer: %s"), *ErrorString);
+		UE_LOG(LogTemp, Warning, TEXT("UOdinFmodAdapter: missmatch during FillSamplesBuffer in dspreadcallback"));
 		return FMOD_OK;
 	}
 

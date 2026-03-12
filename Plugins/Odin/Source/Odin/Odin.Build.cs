@@ -8,7 +8,6 @@ public class Odin : ModuleRules
 {
   public Odin(ReadOnlyTargetRules Target) : base(Target)
   {
-    Type = ModuleType.CPlusPlus;
     PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
     PrecompileForTargets = PrecompileTargetsType.Any;
     DefaultBuildSettings = BuildSettingsVersion.Latest;
@@ -20,23 +19,28 @@ public class Odin : ModuleRules
     PrivateIncludePaths.Add(Path.Combine(ModuleDirectory, "Private"));
 
     // Enable warnings for using undefined identifiers in #if expressions
+#if UE_5_5_OR_LATER
+    UndefinedIdentifierWarningLevel = 0;
+#else
     bEnableUndefinedIdentifierWarnings = false;
+#endif
 
     // List of public dependency module names
     PublicDependencyModuleNames.AddRange(
-      new string[]
-      {
-            "Core",
-            "CoreUObject",
-            "Engine",
-            "AudioMixer",
-            "SignalProcessing",
-            "AudioCapture",
-            "Json",
-            "JsonUtilities",
-            "OdinLibrary",
-            "Projects", "AudioCaptureCore",
-      }
-  );
-  }
+          new string[]
+          {
+                "Core",
+                "CoreUObject",
+                "Engine",
+                "AudioMixer",
+                "SignalProcessing",
+                "AudioCapture",
+                "HTTP",
+                "Json",
+                "JsonUtilities",
+                "OdinLibrary",
+                "Projects", "AudioCaptureCore",
+          }
+      );
+    }
 }

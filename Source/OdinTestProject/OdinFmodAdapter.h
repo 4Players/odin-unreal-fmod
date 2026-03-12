@@ -8,8 +8,8 @@
 #include "Components/ActorComponent.h"
 #include "OdinFmodAdapter.generated.h"
 
-class OdinMediaSoundGenerator;
-class UOdinPlaybackMedia;
+class FOdinSoundGenerator;
+class UOdinSynthComponent;
 
 UENUM(BlueprintType)
 enum class EFmodDspPan3dRolloffType : uint8 {
@@ -43,7 +43,7 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UFUNCTION(BlueprintCallable, Category = "Odin|Sound")
-	void AssignOdinMedia(UPARAM(ref) UOdinPlaybackMedia*& Media);
+	void AssignOdinMedia(UPARAM(ref) UOdinSynthComponent*& Media);
 
 	FMOD_RESULT dspreadcallback(FMOD_DSP_STATE* dsp_state, float* data, unsigned int datalen, int inchannels);
 
@@ -81,8 +81,8 @@ public:
 protected:
 
 	UPROPERTY(BlueprintReadOnly, Category = "Odin|Sound")
-	UOdinPlaybackMedia* PlaybackMedia = nullptr;
-	TSharedPtr<OdinMediaSoundGenerator, ESPMode::ThreadSafe> SoundGenerator;
+	UOdinSynthComponent* PlaybackMedia = nullptr;
+	TSharedPtr<FOdinSoundGenerator, ESPMode::ThreadSafe> SoundGenerator;
 
 	FMOD::ChannelGroup* group;
 

@@ -4,14 +4,13 @@
 
 #include "OdinJsonValue.h"
 
+#include "OdinFunctionLibrary.h"
+#include "OdinNative/OdinUtils.h"
 #include "Policies/CondensedJsonPrintPolicy.h"
 #include "Serialization/JsonReader.h"
 #include "Serialization/JsonSerializer.h"
-#include <OdinFunctionLibrary.h>
 
-typedef TJsonWriterFactory<TCHAR, TCondensedJsonPrintPolicy<TCHAR>>
-                                                             FCondensedJsonStringWriterFactory;
-typedef TJsonWriter<TCHAR, TCondensedJsonPrintPolicy<TCHAR>> FCondensedJsonStringWriter;
+using namespace OdinUtility;
 
 UOdinJsonObject::UOdinJsonObject(const class FObjectInitializer &PCIP)
     : Super(PCIP)
@@ -24,22 +23,19 @@ UOdinJsonObject *UOdinJsonObject::ConstructJsonObject(UObject *WorldContextObjec
     return NewObject<UOdinJsonObject>();
 }
 
-UOdinJsonObject *UOdinJsonObject::ConstructJsonObjectFromString(UObject *WorldContextObject,
-                                                                FString  data)
+UOdinJsonObject *UOdinJsonObject::ConstructJsonObjectFromString(UObject *WorldContextObject, const FString &Data)
 {
     auto obj = NewObject<UOdinJsonObject>();
-    obj->DecodeJson(data);
+    obj->DecodeJson(Data);
 
     return obj;
 }
 
-UOdinJsonObject *UOdinJsonObject::ConstructJsonObjectFromBytes(UObject *WorldContextObject,
-                                                               const TArray<uint8> &data)
+UOdinJsonObject *UOdinJsonObject::ConstructJsonObjectFromBytes(UObject *WorldContextObject, const TArray<uint8> &Data)
 {
-    auto obj    = NewObject<UOdinJsonObject>();
-    auto s_data = UOdinFunctionLibrary::BytesToString(data);
-    obj->DecodeJson(s_data);
-    return obj;
+    FString Result;
+    UOdinFunctionLibrary::OdinBytesToString(Data, Result);
+    return ConstructJsonObjectFromString(WorldContextObject, Result);
 }
 
 void UOdinJsonObject::Reset()
@@ -56,7 +52,7 @@ TSharedPtr<FJsonObject> &UOdinJsonObject::GetRootObject()
     return JsonObj;
 }
 
-void UOdinJsonObject::SetRootObject(TSharedPtr<FJsonObject> &JsonObject)
+void UOdinJsonObject::SetRootObject(const TSharedPtr<FJsonObject> &JsonObject)
 {
     JsonObj = JsonObject;
 }
@@ -68,8 +64,7 @@ FString UOdinJsonObject::EncodeJson() const
     }
 
     FString                                OutputString;
-    TSharedRef<FCondensedJsonStringWriter> Writer =
-        FCondensedJsonStringWriterFactory::Create(&OutputString);
+    TSharedRef<FCondensedJsonStringWriter> Writer = FCondensedJsonStringWriterFactory::Create(&OutputString);
     FJsonSerializer::Serialize(JsonObj.ToSharedRef(), Writer);
 
     return OutputString;
@@ -82,19 +77,14 @@ TArray<uint8> UOdinJsonObject::EncodeJsonBytes() const
         return data;
     }
 
-    FString OutputString = EncodeJson();
-    uint32  size         = OutputString.Len();
-
-    data.AddUninitialized(size);
-    FTCHARToUTF8_Convert::Convert((UTF8CHAR *)data.GetData(), data.Num(), *OutputString,
-                                  OutputString.Len());
-
+    const FString OutputString = EncodeJson();
+    UOdinFunctionLibrary::OdinStringToBytes(OutputString, data);
     return data;
 }
 
 bool UOdinJsonObject::DecodeJson(const FString &JsonString)
 {
-    TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(*JsonString);
+    TSharedRef<FCondensedJsonStringReader> Reader = FCondensedJsonStringReaderFactory::Create(*JsonString);
     if (FJsonSerializer::Deserialize(Reader, JsonObj) && JsonObj.IsValid()) {
         return true;
     }
@@ -105,7 +95,7 @@ bool UOdinJsonObject::DecodeJson(const FString &JsonString)
     return false;
 }
 
-TArray<FString> UOdinJsonObject::GetFieldNames()
+TArray<FString> UOdinJsonObject::GetFieldNames() const
 {
     TArray<FString> Result;
 
@@ -224,7 +214,7 @@ void UOdinJsonObject::SetBoolField(const FString &FieldName, bool InValue)
     JsonObj->SetBoolField(FieldName, InValue);
 }
 
-TArray<UOdinJsonValue *> UOdinJsonObject::GetArrayField(const FString &FieldName)
+TArray<UOdinJsonValue *> UOdinJsonObject::GetArrayField(const FString &FieldName) const
 {
     TArray<UOdinJsonValue *> OutArray;
     if (!JsonObj.IsValid()) {
@@ -242,8 +232,7 @@ TArray<UOdinJsonValue *> UOdinJsonObject::GetArrayField(const FString &FieldName
     return OutArray;
 }
 
-void UOdinJsonObject::SetArrayField(const FString                  &FieldName,
-                                    const TArray<UOdinJsonValue *> &InArray)
+void UOdinJsonObject::SetArrayField(const FString &FieldName, const TArray<UOdinJsonValue *> &InArray)
 {
     if (!JsonObj.IsValid()) {
         return;
@@ -335,15 +324,14 @@ TArray<float> UOdinJsonObject::GetNumberArrayField(const FString &FieldName)
     }
 
     TArray<TSharedPtr<FJsonValue>> JsonArrayValues = JsonObj->GetArrayField(FieldName);
-    for (TArray<TSharedPtr<FJsonValue>>::TConstIterator It(JsonArrayValues); It; ++It) {
+    for (FCondensedJsonArrayIterator It(JsonArrayValues); It; ++It) {
         NumberArray.Add((*It)->AsNumber());
     }
 
     return NumberArray;
 }
 
-void UOdinJsonObject::SetNumberArrayField(const FString       &FieldName,
-                                          const TArray<float> &NumberArray)
+void UOdinJsonObject::SetNumberArrayField(const FString &FieldName, const TArray<float> &NumberArray)
 {
     if (!JsonObj.IsValid()) {
         return;
@@ -367,15 +355,14 @@ TArray<FString> UOdinJsonObject::GetStringArrayField(const FString &FieldName)
     }
 
     TArray<TSharedPtr<FJsonValue>> JsonArrayValues = JsonObj->GetArrayField(FieldName);
-    for (TArray<TSharedPtr<FJsonValue>>::TConstIterator It(JsonArrayValues); It; ++It) {
+    for (FCondensedJsonArrayIterator It(JsonArrayValues); It; ++It) {
         StringArray.Add((*It)->AsString());
     }
 
     return StringArray;
 }
 
-void UOdinJsonObject::SetStringArrayField(const FString         &FieldName,
-                                          const TArray<FString> &StringArray)
+void UOdinJsonObject::SetStringArrayField(const FString &FieldName, const TArray<FString> &StringArray)
 {
     if (!JsonObj.IsValid()) {
         return;
@@ -399,7 +386,7 @@ TArray<bool> UOdinJsonObject::GetBoolArrayField(const FString &FieldName)
     }
 
     TArray<TSharedPtr<FJsonValue>> JsonArrayValues = JsonObj->GetArrayField(FieldName);
-    for (TArray<TSharedPtr<FJsonValue>>::TConstIterator It(JsonArrayValues); It; ++It) {
+    for (FCondensedJsonArrayIterator It(JsonArrayValues); It; ++It) {
         BoolArray.Add((*It)->AsBool());
     }
 
@@ -421,7 +408,7 @@ void UOdinJsonObject::SetBoolArrayField(const FString &FieldName, const TArray<b
     JsonObj->SetArrayField(FieldName, EntriesArray);
 }
 
-TArray<UOdinJsonObject *> UOdinJsonObject::GetObjectArrayField(const FString &FieldName)
+TArray<UOdinJsonObject *> UOdinJsonObject::GetObjectArrayField(const FString &FieldName) const
 {
     TArray<UOdinJsonObject *> OutArray;
 
@@ -442,8 +429,7 @@ TArray<UOdinJsonObject *> UOdinJsonObject::GetObjectArrayField(const FString &Fi
     return OutArray;
 }
 
-void UOdinJsonObject::SetObjectArrayField(const FString                   &FieldName,
-                                          const TArray<UOdinJsonObject *> &ObjectArray)
+void UOdinJsonObject::SetObjectArrayField(const FString &FieldName, const TArray<UOdinJsonObject *> &ObjectArray)
 {
     if (!JsonObj.IsValid()) {
         return;
