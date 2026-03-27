@@ -6,18 +6,17 @@
 #include "odin.h"
 #include "OdinFunctionLibrary.h"
 #include "OdinAudio/OdinSoundGenerator.h"
-#include "OdinAudio/OdinSynthComponent.h"
 #include <Kismet/KismetMathLibrary.h>
 
-void UOdinFmodAdapter::AssignOdinMedia(UPARAM(ref) UOdinSynthComponent*& Media)
+void UOdinFmodAdapter::AssignOdinDecoder(UOdinDecoder* Decoder)
 {
-	if (nullptr == Media)
+	if (nullptr == Decoder)
 		return;
 
 	this->SoundGenerator = MakeShared<FOdinSoundGenerator, ESPMode::ThreadSafe>();
-	this->PlaybackMedia = Media;
+	this->PlaybackDecoder = Decoder;
 
-	SoundGenerator->SetOdinDecoder(Media->GetDecoder());
+	SoundGenerator->SetOdinDecoder(Decoder);
 }
 
 void UOdinFmodAdapter::SetAttenuation(EFmodDspPan3dRolloffType InRolloffType, float InMinimumDistance, float InMaximumDistance, EFmodDspPan3dExtentMode InExtentMode, float InSoundSize, float InMinimumExtent, float InOutputGain)
@@ -200,7 +199,7 @@ FMOD_RESULT UOdinFmodAdapter::dspreadcallback(FMOD_DSP_STATE* dsp_state, float* 
 	if (!data)
 		return FMOD_ERR_INVALID_PARAM;
 
-	if (!SoundGenerator || !PlaybackMedia)
+	if (!SoundGenerator || !PlaybackDecoder)
 		return FMOD_OK;
 
 	unsigned int requestedDataArrayLength = datalen * 2;
