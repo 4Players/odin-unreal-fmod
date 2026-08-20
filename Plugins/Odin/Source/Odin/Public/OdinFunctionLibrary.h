@@ -61,7 +61,7 @@ class ODIN_API UOdinFunctionLibrary : public UBlueprintFunctionLibrary
 
     UFUNCTION(BlueprintPure,
               meta     = (DisplayName = "Get Decoders for Peer",
-                      ToolTip     = "Retrieves all decoders that have been registered for this room with the given peer id."),
+                          ToolTip     = "Retrieves all decoders that have been registered for this room with the given peer id."),
               Category = "Odin|Audio Pipeline")
     static TArray<UOdinDecoder*> GetDecodersForPeer(UOdinRoom* Room, int64 PeerId);
 
@@ -73,7 +73,7 @@ class ODIN_API UOdinFunctionLibrary : public UBlueprintFunctionLibrary
      */
     UFUNCTION(BlueprintCallable,
               meta     = (DisplayName = "Deregister Decoder From All", ToolTip = "Deregisters a Decoder from all connections it receives audio from.",
-                      Keywords = "Unlink"),
+                          Keywords = "Unlink"),
               Category = "Odin|Audio Pipeline")
     static void DeregisterDecoderFromAllConnections(UOdinDecoder* Decoder);
 

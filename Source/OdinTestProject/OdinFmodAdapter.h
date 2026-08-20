@@ -83,6 +83,7 @@ protected:
 	UPROPERTY(BlueprintReadOnly, Category = "Odin|Sound")
 	UOdinDecoder* PlaybackDecoder = nullptr;
 	TSharedPtr<FOdinSoundGenerator, ESPMode::ThreadSafe> SoundGenerator;
+	TAtomic<bool> bLoggedMissingDecoder { false };
 
 	FMOD::ChannelGroup* group;
 

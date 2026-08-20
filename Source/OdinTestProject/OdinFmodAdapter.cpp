@@ -5,18 +5,29 @@
 #include "FMODStudioModule.h"
 #include "odin.h"
 #include "OdinFunctionLibrary.h"
+#include "OdinAudio/OdinDecoder.h"
 #include "OdinAudio/OdinSoundGenerator.h"
 #include <Kismet/KismetMathLibrary.h>
 
 void UOdinFmodAdapter::AssignOdinDecoder(UOdinDecoder* Decoder)
 {
 	if (nullptr == Decoder)
+	{
+		UE_LOG(LogTemp, Error, TEXT("OdinFmodAdapter[%s]: AssignOdinDecoder received nullptr"), *GetPathName());
 		return;
+	}
 
 	this->SoundGenerator = MakeShared<FOdinSoundGenerator, ESPMode::ThreadSafe>();
 	this->PlaybackDecoder = Decoder;
 
 	SoundGenerator->SetOdinDecoder(Decoder);
+	bLoggedMissingDecoder.Store(false);
+
+	const bool bHandleValid = Decoder->GetHandle().IsValid();
+	UE_LOG(LogTemp, Warning,
+		TEXT("OdinFmodAdapter[%s]: decoder assigned (Decoder=%s, HandleValid=%s, SampleRate=%d, Channels=%d, NetMode=%d)"),
+		*GetPathName(), *Decoder->GetPathName(), bHandleValid ? TEXT("true") : TEXT("false"),
+		Decoder->SampleRate, Decoder->bStereo ? 2 : 1, GetWorld() ? static_cast<int32>(GetWorld()->GetNetMode()) : -1);
 }
 
 void UOdinFmodAdapter::SetAttenuation(EFmodDspPan3dRolloffType InRolloffType, float InMinimumDistance, float InMaximumDistance, EFmodDspPan3dExtentMode InExtentMode, float InSoundSize, float InMinimumExtent, float InOutputGain)
@@ -40,7 +51,7 @@ FMOD_RESULT UOdinFmodAdapter::OdinDSPReadCallback(FMOD_DSP_STATE* dsp_state, flo
 
 	dsp_state->functions->getuserdata(dsp_state, &userdata);
 
-	*outchannels = 2;
+	*outchannels = 1;
 
 	UOdinFmodAdapter* instance = reinterpret_cast<UOdinFmodAdapter*>(userdata);
 
@@ -122,6 +133,11 @@ FMOD_VECTOR UOdinFmodAdapter::ConvertUnrealToFmodVector(FVector in, float scale)
 
 void UOdinFmodAdapter::BeginPlay()
 {
+	Super::BeginPlay();
+
+	UE_LOG(LogTemp, Warning, TEXT("OdinFmodAdapter[%s]: BeginPlay (NetMode=%d)"), *GetPathName(),
+		GetWorld() ? static_cast<int32>(GetWorld()->GetNetMode()) : -1);
+
 	FMOD::Studio::System* System = IFMODStudioModule::Get().GetStudioSystem(EFMODSystemContext::Runtime);
 	FMOD::System* CoreSystem = nullptr;
 	System->getCoreSystem(&CoreSystem);
@@ -132,6 +148,7 @@ void UOdinFmodAdapter::BeginPlay()
 	desc.read = mReadCallback;
 	desc.userdata = this;
 	desc.numoutputbuffers = 1;
+	desc.pluginsdkversion = FMOD_PLUGIN_SDK_VERSION;
 
 	FMOD_RESULT res = CoreSystem->createDSP(&desc, &mOdinDSP);
 
@@ -200,9 +217,18 @@ FMOD_RESULT UOdinFmodAdapter::dspreadcallback(FMOD_DSP_STATE* dsp_state, float* 
 		return FMOD_ERR_INVALID_PARAM;
 
 	if (!SoundGenerator || !PlaybackDecoder)
+	{
+		FMemory::Memzero(data, sizeof(float) * datalen);
+		if (!bLoggedMissingDecoder.Exchange(true))
+		{
+			UE_LOG(LogTemp, Warning,
+				TEXT("OdinFmodAdapter[%s]: DSP callback is active but no decoder is assigned (Frames=%u, InputChannels=%d)"),
+				*GetPathName(), datalen, inchannels);
+		}
 		return FMOD_OK;
+	}
 
-	unsigned int requestedDataArrayLength = datalen * 2;
+	unsigned int requestedDataArrayLength = datalen;
 
 	const uint32 Result = SoundGenerator->OnGenerateAudio(data, (int32)requestedDataArrayLength);
 

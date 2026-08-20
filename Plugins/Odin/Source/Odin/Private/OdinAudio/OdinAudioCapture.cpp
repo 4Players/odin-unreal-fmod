@@ -11,7 +11,7 @@ void UOdinAudioCapture::BeginDestroy()
     ODIN_LOG(Verbose, "ODIN Destroy: %s", ANSI_TO_TCHAR(__FUNCTION__));
 
     Super::BeginDestroy();
-    if (AudioCapture.IsStreamOpen()) {
+    if (AudioCapture.IsStreamOpen() && AudioCapture.IsCapturing()) {
         AudioCapture.AbortStream();
     }
 }
@@ -67,9 +67,7 @@ void UOdinAudioCapture::GetCaptureDevicesAvailable(TArray<FOdinCaptureDeviceInfo
 }
 
 void UOdinAudioCapture::GetCurrentAudioCaptureDevice(FOdinCaptureDeviceInfo& CurrentDevice) const
-{
-    CurrentDevice = CurrentSelectedDevice;
-}
+{ CurrentDevice = CurrentSelectedDevice; }
 
 void UOdinAudioCapture::ChangeToDefaultCaptureDevice()
 {
@@ -253,9 +251,7 @@ void UOdinAudioCapture::Tick(float DeltaTime)
 }
 
 bool UOdinAudioCapture::IsTickable() const
-{
-    return GetTryRecognizingDeviceDisconnected();
-}
+{ return GetTryRecognizingDeviceDisconnected(); }
 
 void UOdinAudioCapture::InitializeGenerator()
 {
@@ -320,14 +316,10 @@ void UOdinAudioCapture::TryRetrieveDefaultDevice()
 }
 
 bool UOdinAudioCapture::GetTryRecognizingDeviceDisconnected() const
-{
-    return bTryRecognizingDeviceDisconnect;
-}
+{ return bTryRecognizingDeviceDisconnect; }
 
 void UOdinAudioCapture::SetTryRecognizingDeviceDisconnected(bool bTryRecognizing)
-{
-    bTryRecognizingDeviceDisconnect = bTryRecognizing;
-}
+{ bTryRecognizingDeviceDisconnect = bTryRecognizing; }
 
 bool UOdinAudioCapture::RestartCapturing(bool bAutomaticallyStartCapture)
 {
