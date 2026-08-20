@@ -5,8 +5,6 @@ This Unreal Engine sample project shows how to implement and use a class that pa
 ![FMOD and Odin](/Documentation/fmod_with_odin_header.jpg)
 
 ## Pre-requisities
-> [!IMPORTANT]
-> ***main** is not guaranteed to build*
 [Odin V1 Fmod Adapter Branch](https://github.com/4Players/odin-unreal-fmod/tree/v1) or [Odin V2 Fmod Adapter Branch](https://github.com/4Players/odin-unreal-fmod/tree/v2)
 
 To be able to use the project you will need to have access to FMOD Studio and their Unreal Plugin. You can get them [here](https://www.fmod.com/download#fmodforunreal). Copy the content of the downloaded zip file into the Plugins folder of the project.
